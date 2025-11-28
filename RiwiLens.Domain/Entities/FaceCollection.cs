@@ -4,7 +4,7 @@ namespace RiwiLens.Domain.Entities;
 public class FaceCollection
 {
     public int Id { get; set; }
-    public int CoderId { get; set; }
+    public string CoderId { get; set; }
     public string CollectionId { get; set; } = string.Empty;
     public string FaceId { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;

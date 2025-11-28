@@ -5,7 +5,7 @@ public class ClanTeamLeader
 {
     public int Id { get; set; }
     public int ClanId { get; set; }
-    public int TeamLeaderId { get; set; }
+    public string TeamLeaderId { get; set; }
     public int RoleTeamLeaderId { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }

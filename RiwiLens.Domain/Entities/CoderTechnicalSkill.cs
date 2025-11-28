@@ -6,7 +6,7 @@ namespace RiwiLens.Domain.Entities;
 public class CoderTechnicalSkill
 {
     public int Id { get; set; }
-    public int CoderId { get; set; }
+    public string CoderId { get; set; }
     public int SkillId { get; set; }
     public TechnicalSkillLevel Level { get; set; }
 

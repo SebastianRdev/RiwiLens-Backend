@@ -7,7 +7,7 @@ public class Class
     public DateTime Date { get; set; }
     public int DayId { get; set; }
     public int ClassTypeId { get; set; }
-    public int TeamLeaderId { get; set; }
+    public string TeamLeaderId { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public DateTime CreatedAt { get; set; }

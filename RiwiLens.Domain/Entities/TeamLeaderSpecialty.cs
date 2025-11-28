@@ -6,7 +6,7 @@ namespace RiwiLens.Domain.Entities;
 public class TeamLeaderSpecialty
 {
     public int Id { get; set; }
-    public int TeamLeaderId { get; set; }
+    public string TeamLeaderId { get; set; }
     public int SpecialtyId { get; set; }
     public TeamLeaderSpecialtyLevel Level { get; set; }
     public DateTime CreatedAt { get; set; }

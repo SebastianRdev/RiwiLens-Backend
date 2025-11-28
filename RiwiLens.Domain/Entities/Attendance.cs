@@ -8,7 +8,7 @@ public class Attendance
     public Clan Clan { get; set; } = default!;
     public int ClassId { get; set; }
     public Class Class { get; set; } = default!;
-    public int CoderId { get; set; }
+    public string CoderId { get; set; }
     public Coder Coder { get; set; } = default!;
     public DateTime TimestampIn { get; set; }
     public string VerifiedBy { get; set; } = string.Empty;

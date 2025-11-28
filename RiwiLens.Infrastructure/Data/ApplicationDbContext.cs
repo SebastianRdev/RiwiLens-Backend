@@ -28,6 +28,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        // Coder → ProfessionalProfile (1-M)
+        modelBuilder.Entity<Coder>()
+            .HasOne(c => c.ProfessionalProfile)
+            .WithMany(p => p.Coders)
+            .HasForeignKey(c => c.ProfessionalProfileId);
 
         // Coder → Technical Skills (1-M)
         modelBuilder.Entity<Coder>()

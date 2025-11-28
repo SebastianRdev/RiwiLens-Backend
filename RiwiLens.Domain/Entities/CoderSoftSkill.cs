@@ -4,7 +4,7 @@ namespace RiwiLens.Domain.Entities;
 public class CoderSoftSkill
 {
     public int Id { get; set; }
-    public int CoderId { get; set; }
+    public string CoderId { get; set; }
     public int SoftSkillId { get; set; }
 
     public Coder Coder { get; set; }
