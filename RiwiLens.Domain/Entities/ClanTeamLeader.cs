@@ -11,4 +11,8 @@ public class ClanTeamLeader
     public DateTime EndDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public Clan Clan { get; set; }
+    public TeamLeader TeamLeader { get; set; }
+    public RoleTeamLeader RoleTeamLeader { get; set; }
 }

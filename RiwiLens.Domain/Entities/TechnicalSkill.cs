@@ -8,4 +8,7 @@ public class TechnicalSkill
     public int CategoryId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public CategoryTechnicalSkill Category { get; set; }
+    public ICollection<CoderTechnicalSkill> CoderTechnicalSkills { get; set; }
 }

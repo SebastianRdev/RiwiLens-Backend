@@ -8,4 +8,7 @@ public class Feedback
     public int TeamLeaderId { get; set; }
     public string Message { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+
+    public Coder Coder { get; set; }
+    public TeamLeader TeamLeader { get; set; }
 }

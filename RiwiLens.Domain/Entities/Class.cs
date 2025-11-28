@@ -12,4 +12,8 @@ public class Class
     public TimeSpan EndTime { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public Day Day { get; set; }
+    public ClassType ClassType { get; set; }
+    public TeamLeader TeamLeader { get; set; }
 }

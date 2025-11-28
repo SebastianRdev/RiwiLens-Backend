@@ -11,4 +11,7 @@ public class ClanCoder
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public Clan Clan { get; set; }
+    public Coder Coder { get; set; }
 }

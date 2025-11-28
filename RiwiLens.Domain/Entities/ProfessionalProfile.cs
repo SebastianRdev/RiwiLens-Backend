@@ -4,7 +4,6 @@ namespace RiwiLens.Domain.Entities;
 public class ProfessionalProfile
 {
     public int Id { get; set; }
-    public int CoderId { get; set; }
     public string AboutMe { get; set; } = string.Empty;
     public string LinkedIn { get; set; } = string.Empty;
     public string GitHub { get; set; } = string.Empty;
@@ -12,4 +11,6 @@ public class ProfessionalProfile
     public decimal PercentageProfile { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<Coder> Coders { get; set; } = new List<Coder>();
 }
