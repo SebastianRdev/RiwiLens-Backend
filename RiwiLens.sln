@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Domain", "RiwiLens.Domain\RiwiLens.Domain.csproj", "{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Application", "RiwiLens.Application\RiwiLens.Application.csproj", "{8D89C234-A456-490E-9477-CB7972D81F95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Infrastructure", "RiwiLens.Infrastructure\RiwiLens.Infrastructure.csproj", "{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Tests", "RiwiLens.Tests\RiwiLens.Tests.csproj", "{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Api", "RiwiLens.Api\RiwiLens.Api.csproj", "{83917165-D3B0-4278-BBCE-F8D41409E47F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D89C234-A456-490E-9477-CB7972D81F95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D89C234-A456-490E-9477-CB7972D81F95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D89C234-A456-490E-9477-CB7972D81F95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D89C234-A456-490E-9477-CB7972D81F95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83917165-D3B0-4278-BBCE-F8D41409E47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83917165-D3B0-4278-BBCE-F8D41409E47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83917165-D3B0-4278-BBCE-F8D41409E47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83917165-D3B0-4278-BBCE-F8D41409E47F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

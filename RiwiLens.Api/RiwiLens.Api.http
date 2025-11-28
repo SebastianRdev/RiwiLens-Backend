@@ -1,0 +1,6 @@
+@RiwiLens.Api_HostAddress = http://localhost:5133
+
+GET {{RiwiLens.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
