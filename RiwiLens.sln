@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Domain", "RiwiLens.Domain\RiwiLens.Domain.csproj", "{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src.RiwiLens.Domain", "src.RiwiLens.Domain\src.RiwiLens.Domain.csproj", "{5129DF9F-ACCB-46A9-962C-47FE7A19FD90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Application", "RiwiLens.Application\RiwiLens.Application.csproj", "{8D89C234-A456-490E-9477-CB7972D81F95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src.RiwiLens.Application", "src.RiwiLens.Application\src.RiwiLens.Application.csproj", "{8D89C234-A456-490E-9477-CB7972D81F95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Infrastructure", "RiwiLens.Infrastructure\RiwiLens.Infrastructure.csproj", "{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src.RiwiLens.Infrastructure", "src.RiwiLens.Infrastructure\src.RiwiLens.Infrastructure.csproj", "{FB90ECA4-BFEC-4220-858F-5DBCE7A4AEDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Tests", "RiwiLens.Tests\RiwiLens.Tests.csproj", "{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src.RiwiLens.Tests", "RiwiLens.Tests\RiwiLens.Tests.csproj", "{0A2C7C38-6F69-4FA1-A74F-07883FE7D34D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Api", "RiwiLens.Api\RiwiLens.Api.csproj", "{83917165-D3B0-4278-BBCE-F8D41409E47F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src.RiwiLens.Api", "src.RiwiLens.Api\src.RiwiLens.Api.csproj", "{83917165-D3B0-4278-BBCE-F8D41409E47F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
