@@ -17,11 +17,11 @@
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.22" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22"/>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\src.RiwiLens.Domain\src.RiwiLens.Domain.csproj" />
+      <ProjectReference Include="..\RiwiLens.Domain\RiwiLens.Domain.csproj" />
     </ItemGroup>
 
 </Project>

@@ -2,8 +2,9 @@ namespace src.RiwiLens.Domain.Enums;
 
 public enum TechnicalSkillLevel
 {
-    Beginner,
-    Intermediate,
-    Advanced,
-    Expert
+    Unknown = 0,
+    Beginner = 1,
+    Intermediate = 2,
+    Advanced = 3,
+    Expert = 4
 }

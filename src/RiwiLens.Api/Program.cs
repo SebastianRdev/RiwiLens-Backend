@@ -1,10 +1,10 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-using RiwiLens.Infrastructure.Data;
+using src.RiwiLens.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
+Env.Load("../../.env");
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 

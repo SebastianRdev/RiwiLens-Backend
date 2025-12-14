@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace src.RiwiLens.Domain.Entities;
+namespace src.RiwiLens.Infrastructure.Identity;
 
 public class ApplicationRole : IdentityRole
 {

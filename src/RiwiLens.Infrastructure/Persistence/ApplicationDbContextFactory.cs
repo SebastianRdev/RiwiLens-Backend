@@ -2,9 +2,10 @@ using System.IO;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using src.RiwiLens.Infrastructure.Data;
+using src.RiwiLens.Infrastructure.Identity;
+using src.RiwiLens.Infrastructure.Persistence;
 
-namespace src.RiwiLens.Infrastructure.Data
+namespace src.RiwiLens.Infrastructure.Persistence
 {
     public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
@@ -13,7 +14,7 @@ namespace src.RiwiLens.Infrastructure.Data
             // Load .env manually (EF Core design-time does NOT load Program.cs)
             var basePath = Directory.GetCurrentDirectory();
 
-            // Busca el .env en Infrastructure
+            // Search .env
             var envPath = Path.Combine(basePath, ".env");
 
             if (File.Exists(envPath))

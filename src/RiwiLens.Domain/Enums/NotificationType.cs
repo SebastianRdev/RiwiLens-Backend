@@ -2,8 +2,9 @@ namespace src.RiwiLens.Domain.Enums;
 
 public enum NotificationType
 {
-    Info,
-    Warning,
-    Alert,
-    System
+    Unknown = 0,
+    Info = 1,
+    Warning = 2,
+    Alert = 3,
+    System = 4
 }
