@@ -1,13 +1,15 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-using src.RiwiLens.Infrastructure.Persistence;
-using src.RiwiLens.Infrastructure.Data.Seed;
 using Microsoft.AspNetCore.Identity;
-using src.RiwiLens.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
+using Microsoft.OpenApi.Models;
+using src.RiwiLens.Infrastructure.Persistence;
+using src.RiwiLens.Infrastructure.Data.Seed;
+using src.RiwiLens.Infrastructure.Services.Identity;
+using src.RiwiLens.Infrastructure.Identity;
+using src.RiwiLens.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,7 +82,7 @@ builder.Services.AddAuthentication(options =>
 // ========================
 // SERVICES
 // ========================
-builder.Services.AddScoped<IJwtService, Infrastructure.Services.Identity.JwtService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 
 // ==========================================

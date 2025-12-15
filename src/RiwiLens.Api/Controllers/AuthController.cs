@@ -1,7 +1,6 @@
-using Application.Interfaces;
-using src.RiwiLens.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using src.RiwiLens.Application.Interfaces;
+using src.RiwiLens.Application.DTOs.Auth;
 
 namespace src.RiwiLens.Api.Controllers;
 
@@ -9,37 +8,28 @@ namespace src.RiwiLens.Api.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly IJwtService _jwtService;
+    private readonly IAuthService _authService;
 
-    public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
+    public AuthController(IAuthService authService)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _jwtService = jwtService;
+        _authService = authService;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        var user = await _userManager.FindByEmailAsync(dto.Email);
-        if (user == null)
-            return Unauthorized("Invalid credentials");
+        var result = await _authService.LoginAsync(dto.Email, dto.Password);
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-        if (!result.Succeeded)
-            return Unauthorized("Invalid credentials");
+        if (!result.Success)
+            return Unauthorized(result.Message);
 
-        var roles = await _userManager.GetRolesAsync(user);
-        var token = _jwtService.GenerateToken(user, roles);
-
-        return Ok(new { token });
+        return Ok(result);
     }
-}
 
-public class LoginDto
-{
-    public string Email { get; set; }
-    public string Password { get; set; }
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var result = await _authService.LogoutAsync();
+        return Ok(result);
+    }
 }
