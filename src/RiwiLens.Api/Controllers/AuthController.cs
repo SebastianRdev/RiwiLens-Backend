@@ -25,11 +25,4 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
-
-    [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
-    {
-        var result = await _authService.LogoutAsync();
-        return Ok(result);
-    }
 }

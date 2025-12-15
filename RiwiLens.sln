@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Infrastructure", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Api", "src\RiwiLens.Api\RiwiLens.Api.csproj", "{624712E7-7B44-4329-A8D5-CC0622ABE0A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiwiLens.Tests", "RiwiLens.Tests\RiwiLens.Tests.csproj", "{78D3D616-4AD1-45FB-8F92-800AD498B1DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{624712E7-7B44-4329-A8D5-CC0622ABE0A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{624712E7-7B44-4329-A8D5-CC0622ABE0A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{624712E7-7B44-4329-A8D5-CC0622ABE0A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78D3D616-4AD1-45FB-8F92-800AD498B1DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78D3D616-4AD1-45FB-8F92-800AD498B1DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78D3D616-4AD1-45FB-8F92-800AD498B1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78D3D616-4AD1-45FB-8F92-800AD498B1DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{02AEE614-7773-4AEC-B1D0-2A2C5DC9608C} = {1B8CABBF-1210-40AA-BBAB-570369573FD7}

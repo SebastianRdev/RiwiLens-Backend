@@ -44,18 +44,20 @@ public class JwtService : IJwtService
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
-                _configuration["Jwt:Key"]
-                ?? throw new InvalidOperationException("JWT Key not configured")
+                _configuration["JWT_KEY"]
+                ?? throw new InvalidOperationException("JWT_KEY not configured")
             )
         );
 
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expiresMinutes = int.Parse(_configuration["Jwt:ExpireMinutes"] ?? "60");
+        var expiresMinutes = int.Parse(
+            _configuration["JWT_EXPIRE_MINUTES"] ?? "60"
+        );
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: _configuration["JWT_ISSUER"],
+            audience: _configuration["JWT_AUDIENCE"],
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(expiresMinutes),
             signingCredentials: credentials

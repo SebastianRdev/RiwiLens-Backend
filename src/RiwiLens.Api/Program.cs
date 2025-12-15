@@ -6,21 +6,28 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using src.RiwiLens.Infrastructure;
 using src.RiwiLens.Infrastructure.Persistence;
 using src.RiwiLens.Infrastructure.Data.Seed;
 using src.RiwiLens.Infrastructure.Services.Identity;
 using src.RiwiLens.Infrastructure.Identity;
 using src.RiwiLens.Application.Interfaces;
 
+Env.Load("../../.env");
+
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load("../../.env");
+builder.Configuration.AddEnvironmentVariables();
+
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// ========================
+// IDENTITY
+// ========================
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.Password.RequiredLength = 6;
@@ -35,28 +42,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 
 builder.Services.AddControllersWithViews();
 
-// ========================
-// IDENTITY
-// ========================
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "DefaultKeyMustBeLongEnough123456789"))
-    };
-});
 
 // ========================
 // JWT
@@ -66,7 +52,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -74,16 +60,29 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "DefaultKeyMustBeLongEnough123456789"))
+
+        ValidIssuer = builder.Configuration["JWT_ISSUER"]
+            ?? throw new InvalidOperationException("JWT_ISSUER not configured"),
+
+        ValidAudience = builder.Configuration["JWT_AUDIENCE"]
+            ?? throw new InvalidOperationException("JWT_AUDIENCE not configured"),
+
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(
+                builder.Configuration["JWT_KEY"]
+                ?? throw new InvalidOperationException("JWT_KEY not configured")
+            )
+        ),
+
+        ClockSkew = TimeSpan.Zero
     };
 });
+
 
 // ========================
 // SERVICES
 // ========================
-builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 
 // ==========================================
@@ -127,7 +126,6 @@ builder.Services.AddSwaggerGen(c =>
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -152,6 +150,7 @@ app.MapGet("/", context =>
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
 
 // ==========================================
