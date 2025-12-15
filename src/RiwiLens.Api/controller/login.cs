@@ -11,7 +11,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login()
     {
-        // Para prueba, generamos un token "dummy"
+        // Para prueba, generamos un token "dummy" new messsges 
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, "testuser"),
