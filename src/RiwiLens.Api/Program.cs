@@ -1,4 +1,3 @@
-using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,8 +10,7 @@ using src.RiwiLens.Infrastructure.Data.Seed;
 using src.RiwiLens.Infrastructure.Services.Identity;
 using src.RiwiLens.Application.Interfaces;
 using src.RiwiLens.Domain.Entities;
-
-Env.Load("../../.env");
+using System.Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +18,12 @@ builder.Configuration.AddEnvironmentVariables();
 
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+
+foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
+{
+    Console.WriteLine($"ENV {env.Key} = {env.Value}");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -132,8 +136,11 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseRouting();
 
 // Endpoint de prueba raíz
@@ -160,19 +167,17 @@ using (var scope = app.Services.CreateScope())
     try
     {
         db.Database.Migrate();
-        db.Database.OpenConnection();
         Console.WriteLine("✅ API connected to Database successfully");
-        db.Database.CloseConnection();
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database connection error: {ex.Message}");
     }
 }
-
 // ==========================================
 // SEEDS
 // ==========================================
+/*
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -200,6 +205,6 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("✅ All seeds executed successfully");
     }
 }
-
+*/
 
 app.Run();
