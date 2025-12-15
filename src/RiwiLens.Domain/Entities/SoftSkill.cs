@@ -11,12 +11,17 @@ public class SoftSkill
 
     protected SoftSkill() { }
 
-    public SoftSkill(string name, string description)
+    private SoftSkill(string name, string description)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required");
-
         Name = name;
         Description = description;
+    }
+
+    public static SoftSkill Create(string name, string description)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Soft skill name is required.");
+
+        return new SoftSkill(name, description);
     }
 }

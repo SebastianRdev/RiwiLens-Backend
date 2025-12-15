@@ -8,13 +8,26 @@ public class CategoryTechnicalSkill
 
     public ICollection<TechnicalSkill> TechnicalSkills { get; private set; } = new List<TechnicalSkill>();
 
-    protected CategoryTechnicalSkill() { }
+    protected CategoryTechnicalSkill() { } // EF Core
 
-    public CategoryTechnicalSkill(string name)
+    private CategoryTechnicalSkill(string name)
+    {
+        Name = name;
+    }
+
+    public static CategoryTechnicalSkill Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required.");
+            throw new ArgumentException("Category name is required.");
 
-        Name = name;
+        return new CategoryTechnicalSkill(name.Trim());
+    }
+
+    public void Update(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Category name is required.");
+
+        Name = name.Trim();
     }
 }

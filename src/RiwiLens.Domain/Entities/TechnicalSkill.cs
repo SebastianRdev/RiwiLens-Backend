@@ -12,7 +12,7 @@ public class TechnicalSkill
 
     protected TechnicalSkill() { }
 
-    public TechnicalSkill(string name, int categoryId)
+    private TechnicalSkill(string name, int categoryId)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Name is required.");
@@ -20,6 +20,29 @@ public class TechnicalSkill
             throw new ArgumentException("Invalida CategoryId.");
 
         Name = name;
+        CategoryId = categoryId;
+    }
+
+    public static TechnicalSkill Create(string name, int categoryId)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Technical skill name is required.");
+
+        if (categoryId <= 0)
+            throw new ArgumentException("Invalid category.");
+
+        return new TechnicalSkill(name.Trim(), categoryId);
+    }
+
+    public void Update(string name, int categoryId)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Technical skill name is required.");
+
+        if (categoryId <= 0)
+            throw new ArgumentException("Invalid category.");
+
+        Name = name.Trim();
         CategoryId = categoryId;
     }
 }

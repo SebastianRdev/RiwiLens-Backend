@@ -9,16 +9,31 @@ public class Specialty
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
 
-    public ICollection<TeamLeaderSpecialty> TeamLeaderSpecialties { get; private set; } = new List<TeamLeaderSpecialty>();
+    public ICollection<TeamLeaderSpecialty> TeamLeaderSpecialties { get; private set; }
+        = new List<TeamLeaderSpecialty>();
 
-    protected Specialty() { }
+    protected Specialty() { } // EF Core
 
-    public Specialty(string name, string description)
+    private Specialty(string name, string description)
+    {
+        Name = name;
+        Description = description;
+    }
+
+    public static Specialty Create(string name, string description)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required.");
+            throw new ArgumentException("Specialty name is required.");
 
-        Name = name;
+        return new Specialty(name.Trim(), description);
+    }
+
+    public void Update(string name, string description)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Specialty name is required.");
+
+        Name = name.Trim();
         Description = description;
     }
 }
