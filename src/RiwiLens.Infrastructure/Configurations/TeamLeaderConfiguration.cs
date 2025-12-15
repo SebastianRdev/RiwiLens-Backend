@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using src.RiwiLens.Domain.Entities;
-using src.RiwiLens.Infrastructure.Identity;
 
 namespace src.RiwiLens.Infrastructure.Configurations;
 

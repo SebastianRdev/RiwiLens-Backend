@@ -25,5 +25,7 @@ public class ClassConfiguration : IEntityTypeConfiguration<Class>
             .WithMany(ct => ct.Classes)
             .HasForeignKey(c => c.ClassTypeId)
             .OnDelete(DeleteBehavior.Restrict);
+
+
     }
 }

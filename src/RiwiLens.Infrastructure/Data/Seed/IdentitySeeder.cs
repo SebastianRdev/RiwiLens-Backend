@@ -1,4 +1,4 @@
-using src.RiwiLens.Infrastructure.Identity;
+using src.RiwiLens.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace src.RiwiLens.Infrastructure.Data.Seed;

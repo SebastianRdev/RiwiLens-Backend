@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using src.RiwiLens.Application.Interfaces;
 using src.RiwiLens.Application.Common.Auth;
-using src.RiwiLens.Infrastructure.Identity;
+using src.RiwiLens.Domain.Entities;
 
 namespace src.RiwiLens.Infrastructure.Services.Identity;
 

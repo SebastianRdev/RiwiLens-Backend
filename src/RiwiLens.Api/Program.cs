@@ -1,7 +1,6 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using src.RiwiLens.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -10,8 +9,8 @@ using src.RiwiLens.Infrastructure;
 using src.RiwiLens.Infrastructure.Persistence;
 using src.RiwiLens.Infrastructure.Data.Seed;
 using src.RiwiLens.Infrastructure.Services.Identity;
-using src.RiwiLens.Infrastructure.Identity;
 using src.RiwiLens.Application.Interfaces;
+using src.RiwiLens.Domain.Entities;
 
 Env.Load("../../.env");
 
@@ -130,11 +129,8 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
