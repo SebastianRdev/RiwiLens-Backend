@@ -59,6 +59,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+// Endpoint de prueba raíz
+app.MapGet("/", () => "API RiwiLens funcionando!");
+
+
 app.UseAuthentication();
 app.UseAuthorization();
 
