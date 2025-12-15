@@ -22,11 +22,11 @@ public class AuthService : IAuthService
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
-            return AuthResult.Failure("Credenciales inválidas.");
+            return AuthResult.Fail("Credenciales inválidas.");
 
         var passwordValid = await _userManager.CheckPasswordAsync(user, password);
         if (!passwordValid)
-            return AuthResult.Failure("Credenciales inválidas.");
+            return AuthResult.Fail("Credenciales inválidas.");
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -37,12 +37,12 @@ public class AuthService : IAuthService
             roles: roles
         );
 
-        return AuthResult.SuccessResult(token);
+        return AuthResult.Ok(token);
     }
 
     public Task<AuthResult> LogoutAsync()
     {
         // JWT es stateless → no hay nada que invalidar en servidor
-        return Task.FromResult(AuthResult.SuccessResult());
+        return Task.FromResult(AuthResult.Ok(""));
     }
 }
