@@ -22,4 +22,16 @@ public class DashboardController : ControllerBase
     {
         return Ok(await _dashboardService.GetGlobalStatsAsync());
     }
+
+    [HttpGet("user-management-stats")]
+    public async Task<ActionResult<UserManagementStatsDto>> GetUserManagementStats()
+    {
+        return Ok(await _dashboardService.GetUserManagementStatsAsync());
+    }
+
+    [HttpGet("users")]
+    public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
+    {
+        return Ok(await _dashboardService.GetUsersAsync());
+    }
 }

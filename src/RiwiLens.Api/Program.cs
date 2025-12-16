@@ -19,12 +19,6 @@ builder.Configuration.AddEnvironmentVariables();
 
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-
-foreach (DictionaryEntry env in Environment.GetEnvironmentVariables())
-{
-    Console.WriteLine($"ENV {env.Key} = {env.Value}");
-}
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -94,6 +88,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.CustomSchemaIds(type => type.FullName);
+    
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "RiwiLens API",
@@ -206,5 +202,20 @@ using (var scope = app.Services.CreateScope())
     }
 }
 */
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var env = services.GetRequiredService<IWebHostEnvironment>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+
+    if (env.IsDevelopment())
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        await AdminSeed.SeedAdminsAsync(userManager, roleManager);
+    }
+}
+
+
 
 app.Run();

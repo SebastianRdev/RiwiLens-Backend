@@ -16,8 +16,8 @@ public static class AdminSeed
         {
             new ApplicationUser
             {
-                UserName = "admin",
-                Email = "admin@riwi.io",
+                UserName = "admin2",
+                Email = "admin2@riwi.io",
                 EmailConfirmed = true
             }
         };

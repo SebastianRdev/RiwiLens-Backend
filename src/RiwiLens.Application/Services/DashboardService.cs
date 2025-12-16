@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using src.RiwiLens.Application.DTOs.Dashboard;
+using System.Linq;
 using src.RiwiLens.Application.Interfaces.Repositories;
 using src.RiwiLens.Application.Interfaces.Services;
 using src.RiwiLens.Domain.Entities;
@@ -13,18 +16,31 @@ public class DashboardService : IDashboardService
     private readonly IGenericRepository<CoderTechnicalSkill> _coderSkillRepository;
     private readonly IGenericRepository<TechnicalSkill> _skillRepository;
 
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IGenericRepository<ClanCoder> _clanCoderRepository;
+    private readonly IGenericRepository<ClanTeamLeader> _clanTlRepository;
+    private readonly IGenericRepository<StatusCoder> _statusCoderRepository;
+
     public DashboardService(
         IGenericRepository<Coder> coderRepository,
         IGenericRepository<TeamLeader> tlRepository,
         IGenericRepository<Clan> clanRepository,
         IGenericRepository<CoderTechnicalSkill> coderSkillRepository,
-        IGenericRepository<TechnicalSkill> skillRepository)
+        IGenericRepository<TechnicalSkill> skillRepository,
+        UserManager<ApplicationUser> userManager,
+        IGenericRepository<ClanCoder> clanCoderRepository,
+        IGenericRepository<ClanTeamLeader> clanTlRepository,
+        IGenericRepository<StatusCoder> statusCoderRepository)
     {
         _coderRepository = coderRepository;
         _tlRepository = tlRepository;
         _clanRepository = clanRepository;
         _coderSkillRepository = coderSkillRepository;
         _skillRepository = skillRepository;
+        _userManager = userManager;
+        _clanCoderRepository = clanCoderRepository;
+        _clanTlRepository = clanTlRepository;
+        _statusCoderRepository = statusCoderRepository;
     }
 
     public async Task<DashboardStatsDto> GetGlobalStatsAsync()
@@ -72,5 +88,93 @@ public class DashboardService : IDashboardService
             ActiveClans = activeClans,
             TopTechnologies = topTechDtos
         };
+    }
+    public async Task<UserManagementStatsDto> GetUserManagementStatsAsync()
+    {
+        var totalUsers = await _userManager.Users.CountAsync();
+        var totalCoders = await _coderRepository.GetAllAsync();
+        var totalTls = await _tlRepository.GetAllAsync();
+        
+        // Count admins (users with role 'Admin')
+        var admins = await _userManager.GetUsersInRoleAsync("Admin");
+        var totalAdmins = admins.Count;
+
+        return new UserManagementStatsDto
+        {
+            TotalUsers = totalUsers,
+            TotalCoders = totalCoders.Count(),
+            TotalTeamLeaders = totalTls.Count(),
+            TotalAdmins = totalAdmins
+        };
+    }
+
+    public async Task<IEnumerable<UserResponseDto>> GetUsersAsync()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        var userDtos = new List<UserResponseDto>();
+
+        // Pre-fetch data to avoid N+1
+        var coders = await _coderRepository.GetAllAsync();
+        var tls = await _tlRepository.GetAllAsync();
+        var clans = await _clanRepository.GetAllAsync();
+        var clanCoders = await _clanCoderRepository.GetAllAsync();
+        var clanTls = await _clanTlRepository.GetAllAsync();
+        var statuses = await _statusCoderRepository.GetAllAsync();
+
+        // Dictionaries for fast lookup
+        var coderDict = coders.ToDictionary(c => c.UserId);
+        var tlDict = tls.ToDictionary(t => t.UserId);
+        var clanDict = clans.ToDictionary(c => c.Id, c => c.Name);
+        var statusDict = statuses.ToDictionary(s => s.Id, s => s.Name);
+        
+        // Coder -> Clan (Assuming 1 active clan or taking last)
+        var coderClanDict = clanCoders
+            .GroupBy(cc => cc.CoderId)
+            .ToDictionary(g => g.Key, g => g.Last().ClanId); 
+
+        // TL -> Clan
+        var tlClanDict = clanTls
+            .GroupBy(ct => ct.TeamLeaderId)
+            .ToDictionary(g => g.Key, g => g.Last().ClanId);
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault() ?? "User";
+            var clanName = "N/A";
+            var status = "Active"; // Default
+
+            if (role == "Coder" && coderDict.TryGetValue(user.Id, out var coder))
+            {
+                if (coderClanDict.TryGetValue(coder.Id, out var clanId) && clanDict.TryGetValue(clanId, out var cName))
+                {
+                    clanName = cName;
+                }
+                
+                if (statusDict.TryGetValue(coder.StatusId, out var sName))
+                {
+                    status = sName;
+                }
+            }
+            else if (role == "TeamLeader" && tlDict.TryGetValue(user.Id, out var tl))
+            {
+                if (tlClanDict.TryGetValue(tl.Id, out var clanId) && clanDict.TryGetValue(clanId, out var cName))
+                {
+                    clanName = cName;
+                }
+            }
+
+            userDtos.Add(new UserResponseDto
+            {
+                UserId = user.Id,
+                UserName = user.UserName ?? "Unknown",
+                Email = user.Email ?? "Unknown",
+                Role = role,
+                Clan = clanName,
+                Status = status
+            });
+        }
+
+        return userDtos;
     }
 }
