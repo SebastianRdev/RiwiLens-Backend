@@ -2,7 +2,7 @@ using System.IO;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using src.RiwiLens.Infrastructure.Identity;
+using src.RiwiLens.Domain.Entities;
 using src.RiwiLens.Infrastructure.Persistence;
 
 namespace src.RiwiLens.Infrastructure.Persistence

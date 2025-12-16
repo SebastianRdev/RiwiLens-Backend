@@ -51,4 +51,24 @@ public class Class
 
         return new Class(date, dayId, classTypeId, teamLeaderId, start, end);
     }
+
+    public void Update(
+        DateTime date,
+        int dayId,
+        int classTypeId,
+        int teamLeaderId,
+        TimeSpan start,
+        TimeSpan end)
+    {
+        if (end <= start)
+            throw new ArgumentException("The end time must be later.");
+
+        Date = date;
+        DayId = dayId;
+        ClassTypeId = classTypeId;
+        TeamLeaderId = teamLeaderId;
+        StartTime = start;
+        EndTime = end;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

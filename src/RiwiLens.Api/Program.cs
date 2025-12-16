@@ -1,7 +1,5 @@
-using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using src.RiwiLens.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -10,10 +8,9 @@ using src.RiwiLens.Infrastructure;
 using src.RiwiLens.Infrastructure.Persistence;
 using src.RiwiLens.Infrastructure.Data.Seed;
 using src.RiwiLens.Infrastructure.Services.Identity;
-using src.RiwiLens.Infrastructure.Identity;
 using src.RiwiLens.Application.Interfaces;
-
-Env.Load("../../.env");
+using src.RiwiLens.Domain.Entities;
+using System.Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +88,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.CustomSchemaIds(type => type.FullName);
+    
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "RiwiLens API",
@@ -130,14 +129,14 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+if (!app.Environment.IsProduction())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseRouting();
 
 // Endpoint de prueba raíz
@@ -164,19 +163,17 @@ using (var scope = app.Services.CreateScope())
     try
     {
         db.Database.Migrate();
-        db.Database.OpenConnection();
         Console.WriteLine("✅ API connected to Database successfully");
-        db.Database.CloseConnection();
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Database connection error: {ex.Message}");
     }
 }
-
 // ==========================================
 // SEEDS
 // ==========================================
+/*
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -204,6 +201,22 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("✅ All seeds executed successfully");
     }
 }
+*/
+/*
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var env = services.GetRequiredService<IWebHostEnvironment>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+
+    if (env.IsDevelopment())
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        await AdminSeed.SeedAdminsAsync(userManager, roleManager);
+    }
+}
+*/
 
 
 app.Run();

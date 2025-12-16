@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using src.RiwiLens.Domain.Entities;
-using src.RiwiLens.Infrastructure.Identity;
 
 namespace src.RiwiLens.Infrastructure.Persistence;
 

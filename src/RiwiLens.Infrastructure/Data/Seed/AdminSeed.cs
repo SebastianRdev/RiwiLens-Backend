@@ -1,4 +1,4 @@
-using src.RiwiLens.Infrastructure.Identity;
+using src.RiwiLens.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace src.RiwiLens.Infrastructure.Data.Seed;
@@ -16,8 +16,8 @@ public static class AdminSeed
         {
             new ApplicationUser
             {
-                UserName = "admin",
-                Email = "admin@riwi.io",
+                UserName = "admin2",
+                Email = "admin2@riwi.io",
                 EmailConfirmed = true
             }
         };

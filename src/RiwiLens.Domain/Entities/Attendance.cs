@@ -89,4 +89,10 @@ public class Attendance
         VerifiedBy = verifiedBy;
         UpdatedAt = DateTime.UtcNow;
     }
+
+    public void Update(AttendanceStatus status)
+    {
+        Status = status;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }
