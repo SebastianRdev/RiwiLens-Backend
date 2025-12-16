@@ -23,6 +23,50 @@ public class AuthController : ControllerBase
         if (!result.Success)
             return Unauthorized(result.Message);
 
-        return Ok(result);
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps, // Dynamic: true if HTTPS, false if HTTP
+            SameSite = SameSiteMode.Lax,
+            Path = "/",
+            Expires = DateTime.UtcNow.AddMinutes(60)
+        };
+
+        Response.Cookies.Append("access_token", result.Token, cookieOptions);
+
+        return Ok(new { message = "Login successful" });
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("access_token", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
+        });
+
+        return Ok(new { message = "Logout successful" });
+    }
+
+    [HttpGet("me")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public IActionResult Me()
+    {
+        var user = HttpContext.User;
+        var id = user.FindFirst("id")?.Value ?? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        var name = user.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+
+        if (string.IsNullOrEmpty(id)) return Unauthorized();
+
+        return Ok(new
+        {
+            id,
+            email,
+            name
+        });
     }
 }

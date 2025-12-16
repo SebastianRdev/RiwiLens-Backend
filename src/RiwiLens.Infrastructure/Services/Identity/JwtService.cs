@@ -29,7 +29,8 @@ public class JwtService : IJwtService
             new(JwtRegisteredClaimNames.Email, email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(ClaimTypes.NameIdentifier, userId),
-            new(ClaimTypes.Name, userName)
+            new(ClaimTypes.Name, userName),
+            new("id", userId)
         };
 
         foreach (var role in roles)
