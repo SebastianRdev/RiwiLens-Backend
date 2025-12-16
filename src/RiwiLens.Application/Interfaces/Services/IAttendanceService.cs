@@ -7,6 +7,7 @@ public interface IAttendanceService
 {
     Task<AttendanceResponseDto> RegisterAsync(RegisterAttendanceDto dto);
     Task<AttendanceResponseDto> UpdateAsync(int id, UpdateAttendanceDto dto);
+    Task<AttendanceCalendarResponseDto> GetAttendanceCalendarAsync(string userId, int? month, int? year);
     Task<IEnumerable<AttendanceResponseDto>> GetByCoderIdAsync(int coderId);
     Task<IEnumerable<AttendanceResponseDto>> GetByClassIdAsync(int classId);
     Task<IEnumerable<AttendanceResponseDto>> GetByClanIdAndDateAsync(int clanId, DateTime date);

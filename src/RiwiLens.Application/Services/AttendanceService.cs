@@ -3,6 +3,7 @@ using src.RiwiLens.Application.Interfaces.Repositories;
 using src.RiwiLens.Application.Interfaces.Services;
 using src.RiwiLens.Domain.Entities;
 using src.RiwiLens.Domain.Enums;
+using src.RiwiLens.Domain.Enums;
 
 namespace src.RiwiLens.Application.Services;
 
@@ -114,6 +115,60 @@ public class AttendanceService : IAttendanceService
             dtos.Add(await MapToDto(a));
         }
         return dtos;
+    }
+
+    public async Task<AttendanceCalendarResponseDto> GetAttendanceCalendarAsync(string userId, int? month, int? year)
+    {
+        // 1. Find Coder by UserId (Guid)
+        var coders = await _coderRepository.FindAsync(c => c.UserId == userId);
+        var coder = coders.FirstOrDefault();
+        if (coder == null) throw new KeyNotFoundException($"Coder with UserId {userId} not found");
+
+        // 2. Get all attendance for this coder
+        var attendances = await _attendanceRepository.FindAsync(a => a.CoderId == coder.Id);
+
+        // 3. Filter by Month/Year if provided
+        if (month.HasValue)
+        {
+            attendances = attendances.Where(a => a.TimestampIn.Month == month.Value);
+        }
+        if (year.HasValue)
+        {
+            attendances = attendances.Where(a => a.TimestampIn.Year == year.Value);
+        }
+
+        var attendanceList = attendances.ToList();
+
+        // 4. Calculate Summary
+        var totalPresent = attendanceList.Count(a => a.Status == AttendanceStatus.Present);
+        var totalAbsent = attendanceList.Count(a => a.Status == AttendanceStatus.Absent);
+        var totalJustified = attendanceList.Count(a => a.Status == AttendanceStatus.Justified);
+
+        // 5. Map Records
+        var records = attendanceList.Select(a => new AttendanceRecordDto
+        {
+            Date = a.TimestampIn.ToString("yyyy-MM-dd"),
+            Status = a.Status.ToString().ToLower()
+        }).ToList();
+
+        return new AttendanceCalendarResponseDto
+        {
+            Success = true,
+            Data = new AttendanceCalendarDataDto
+            {
+                CoderId = userId,
+                CoderName = coder.FullName,
+                Month = month ?? DateTime.UtcNow.Month,
+                Year = year ?? DateTime.UtcNow.Year,
+                Records = records,
+                Summary = new AttendanceSummaryDto
+                {
+                    TotalPresent = totalPresent,
+                    TotalAbsent = totalAbsent,
+                    TotalJustified = totalJustified
+                }
+            }
+        };
     }
 
     private async Task<AttendanceResponseDto> MapToDto(Attendance a)

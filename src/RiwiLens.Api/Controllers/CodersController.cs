@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using src.RiwiLens.Application.DTOs.Attendance;
 using src.RiwiLens.Application.DTOs.Coder;
 using src.RiwiLens.Application.Interfaces.Services;
+using src.RiwiLens.Domain.Enums;
 
 namespace src.RiwiLens.Api.Controllers;
 
@@ -12,10 +14,12 @@ namespace src.RiwiLens.Api.Controllers;
 public class CodersController : ControllerBase
 {
     private readonly ICoderService _coderService;
+    private readonly IAttendanceService _attendanceService;
 
-    public CodersController(ICoderService coderService)
+    public CodersController(ICoderService coderService, IAttendanceService attendanceService)
     {
         _coderService = coderService;
+        _attendanceService = attendanceService;
     }
 
     [HttpGet]
@@ -55,6 +59,20 @@ public class CodersController : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
+        }
+    }
+
+
+    [HttpGet("{coderId}/attendance")]
+    public async Task<ActionResult<AttendanceCalendarResponseDto>> GetAttendanceCalendar(string coderId, [FromQuery] int? month, [FromQuery] int? year)
+    {
+        try
+        {
+            return Ok(await _attendanceService.GetAttendanceCalendarAsync(coderId, month, year));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
     }
 }

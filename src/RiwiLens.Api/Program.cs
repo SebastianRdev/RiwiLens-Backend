@@ -202,6 +202,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 */
+/*
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -215,7 +216,7 @@ using (var scope = app.Services.CreateScope())
         await AdminSeed.SeedAdminsAsync(userManager, roleManager);
     }
 }
-
+*/
 
 
 app.Run();
