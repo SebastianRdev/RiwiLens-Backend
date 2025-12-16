@@ -51,4 +51,18 @@ public class DashboardController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet("teamleader/{tlId}")]
+    [Authorize(Roles = "Admin,TeamLeader")]
+    public async Task<ActionResult<TeamLeaderDashboardDto>> GetTeamLeaderDashboard(int tlId)
+    {
+        try
+        {
+            return Ok(await _dashboardService.GetTeamLeaderDashboardAsync(tlId));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 }

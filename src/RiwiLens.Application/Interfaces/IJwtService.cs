@@ -9,6 +9,7 @@ public interface IJwtService
         string email,
         string userName,
         IEnumerable<string> roles,
+        int? numericId = null,
         IEnumerable<Claim>? extraClaims = null
     );
 }

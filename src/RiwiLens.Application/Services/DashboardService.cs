@@ -261,4 +261,79 @@ public class DashboardService : IDashboardService
             LatestFeedback = latestFeedbackDto
         };
     }
+
+    public async Task<TeamLeaderDashboardDto> GetTeamLeaderDashboardAsync(int tlId)
+    {
+        var tl = await _tlRepository.GetByIdAsync(tlId);
+        if (tl == null) throw new KeyNotFoundException($"TeamLeader with ID {tlId} not found.");
+
+        // Get Clans assigned to TL
+        var clanTls = await _clanTlRepository.FindAsync(ct => ct.TeamLeaderId == tlId);
+        var clanIds = clanTls.Select(ct => ct.ClanId).Distinct().ToList();
+
+        if (!clanIds.Any())
+        {
+            return new TeamLeaderDashboardDto
+            {
+                TotalCoders = 0,
+                AverageAttendance = 0,
+                Coders = new List<CoderSummaryDto>()
+            };
+        }
+
+        // Get Coders in those Clans
+        var allClanCoders = await _clanCoderRepository.GetAllAsync();
+        var relevantClanCoders = allClanCoders.Where(cc => clanIds.Contains(cc.ClanId)).ToList();
+        
+        var coderIdsInClans = relevantClanCoders.Select(cc => cc.CoderId).Distinct().ToList();
+
+        var coders = new List<CoderSummaryDto>();
+        double totalAttendancePercentage = 0;
+        int codersWithAttendance = 0;
+
+        foreach (var coderId in coderIdsInClans)
+        {
+            var coder = await _coderRepository.GetByIdAsync(coderId);
+            if (coder == null) continue;
+
+            // Get User Email (need to fetch User)
+            var user = await _userManager.FindByIdAsync(coder.UserId);
+            var email = user?.Email ?? "Unknown";
+
+            // Get Status Name
+            var status = "Unknown";
+            var statusObj = await _statusCoderRepository.GetByIdAsync(coder.StatusId);
+            if (statusObj != null) status = statusObj.Name;
+
+            // Calculate Attendance for this coder
+            var attendances = (await _attendanceRepository.FindAsync(a => a.CoderId == coderId)).ToList();
+            var totalClasses = attendances.Count;
+            var presentCount = attendances.Count(a => a.Status == Domain.Enums.AttendanceStatus.Present);
+            var percentage = totalClasses > 0 ? (double)presentCount / totalClasses * 100 : 0;
+
+            if (totalClasses > 0)
+            {
+                totalAttendancePercentage += percentage;
+                codersWithAttendance++;
+            }
+
+            coders.Add(new CoderSummaryDto
+            {
+                Id = coder.Id,
+                FullName = coder.FullName,
+                Email = email,
+                Status = status,
+                ProfileImageUrl = "" // Placeholder
+            });
+        }
+
+        var avgAttendance = codersWithAttendance > 0 ? totalAttendancePercentage / codersWithAttendance : 0;
+
+        return new TeamLeaderDashboardDto
+        {
+            TotalCoders = coders.Count,
+            AverageAttendance = Math.Round(avgAttendance, 2),
+            Coders = coders
+        };
+    }
 }

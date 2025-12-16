@@ -21,6 +21,7 @@ public class JwtService : IJwtService
         string email,
         string userName,
         IEnumerable<string> roles,
+        int? numericId = null,
         IEnumerable<Claim>? extraClaims = null)
     {
         var claims = new List<Claim>
@@ -30,8 +31,13 @@ public class JwtService : IJwtService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(ClaimTypes.NameIdentifier, userId),
             new(ClaimTypes.Name, userName),
-            new("id", userId)
+            new("uuid", userId) // Explicit UUID claim
         };
+
+        if (numericId.HasValue)
+        {
+            claims.Add(new("id", numericId.Value.ToString())); // The requested numeric ID
+        }
 
         foreach (var role in roles)
         {
