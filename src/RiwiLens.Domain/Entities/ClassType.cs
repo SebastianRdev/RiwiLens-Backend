@@ -8,13 +8,26 @@ public class ClassType
 
     public ICollection<Class> Classes { get; private set; } = new List<Class>();
 
-    protected ClassType() { }
+    protected ClassType() { } // EF Core
 
-    public ClassType(string name)
+    private ClassType(string name)
+    {
+        Name = name;
+    }
+
+    public static ClassType Create(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required");
+            throw new ArgumentException("Class type name is required.");
 
-        Name = name;
+        return new ClassType(name.Trim());
+    }
+
+    public void Update(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Class type name is required.");
+
+        Name = name.Trim();
     }
 }
