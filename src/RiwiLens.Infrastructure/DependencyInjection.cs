@@ -7,6 +7,8 @@ using src.RiwiLens.Application.Services;
 using src.RiwiLens.Infrastructure.Repositories;
 using src.RiwiLens.Infrastructure.Services;
 using src.RiwiLens.Infrastructure.Services.Identity;
+using src.RiwiLens.Infrastructure.Services.IA;
+using Google.GenAI;
 
 namespace src.RiwiLens.Infrastructure;
 
@@ -35,6 +37,13 @@ public static class DependencyInjection
         services.AddScoped<ICatalogService, CatalogService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<ICvService, CvService>();
+        
+        services.AddSingleton<Client>(sp => 
+        {
+            var apiKey = configuration["GeminiApiKey"];
+            return new Client(apiKey: apiKey);
+        });
+        services.AddScoped<IAiService, GeminiService>();
 
         return services;
     }

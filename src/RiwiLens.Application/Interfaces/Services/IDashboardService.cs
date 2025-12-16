@@ -7,4 +7,5 @@ public interface IDashboardService
     Task<DashboardStatsDto> GetGlobalStatsAsync();
     Task<UserManagementStatsDto> GetUserManagementStatsAsync();
     Task<IEnumerable<UserResponseDto>> GetUsersAsync();
+    Task<CoderDashboardDto> GetCoderDashboardAsync(int coderId);
 }

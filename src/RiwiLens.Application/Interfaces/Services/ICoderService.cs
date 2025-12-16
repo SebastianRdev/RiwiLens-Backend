@@ -4,7 +4,7 @@ namespace src.RiwiLens.Application.Interfaces.Services;
 
 public interface ICoderService
 {
-    Task<CoderResponseDto?> GetByIdAsync(int id);
+    Task<CoderDetailResponseDto?> GetByIdAsync(int id);
     Task<IEnumerable<CoderResponseDto>> GetAllAsync();
     Task<CoderResponseDto> UpdateAsync(int id, UpdateCoderDto dto);
 }

@@ -130,4 +130,43 @@ public class UserService : IUserService
             Roles = roles
         };
     }
+
+    public async Task<UserResponseDto> UpdateUserAsync(string id, UpdateUserDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) throw new KeyNotFoundException($"User with ID {id} not found.");
+
+        if (!string.IsNullOrEmpty(dto.Email) && dto.Email != user.Email)
+        {
+            var token = await _userManager.GenerateChangeEmailTokenAsync(user, dto.Email);
+            var result = await _userManager.ChangeEmailAsync(user, dto.Email, token);
+            if (!result.Succeeded) throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+            
+            user.UserName = dto.Email; // Keep UserName in sync with Email
+            await _userManager.UpdateAsync(user);
+        }
+
+        if (!string.IsNullOrEmpty(dto.PhoneNumber) && dto.PhoneNumber != user.PhoneNumber)
+        {
+            var result = await _userManager.SetPhoneNumberAsync(user, dto.PhoneNumber);
+            if (!result.Succeeded) throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            Roles = roles
+        };
+    }
+
+    public async Task DeleteUserAsync(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) throw new KeyNotFoundException($"User with ID {id} not found.");
+
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded) throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+    }
 }

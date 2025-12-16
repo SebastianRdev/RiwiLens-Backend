@@ -45,4 +45,40 @@ public class UsersController : ControllerBase
         if (user == null) return NotFound();
         return Ok(user);
     }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<UserResponseDto>> Update(string id, [FromBody] UpdateUserDto dto)
+    {
+        try
+        {
+            var user = await _userService.UpdateUserAsync(id, dto);
+            return Ok(user);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        try
+        {
+            await _userService.DeleteUserAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

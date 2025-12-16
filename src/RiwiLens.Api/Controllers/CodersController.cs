@@ -32,7 +32,7 @@ public class CodersController : ControllerBase
 
     [HttpGet("{id}")]
     [Authorize(Roles = "Admin,TeamLeader")]
-    public async Task<ActionResult<CoderResponseDto>> GetById(int id)
+    public async Task<ActionResult<CoderDetailResponseDto>> GetById(int id)
     {
         var coder = await _coderService.GetByIdAsync(id);
         if (coder == null) return NotFound();
