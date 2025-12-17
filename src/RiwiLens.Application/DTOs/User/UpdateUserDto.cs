@@ -9,5 +9,8 @@ public class UpdateUserDto
     
     public string? PhoneNumber { get; set; }
     
-    // Add other updateable fields as necessary, e.g. Name if stored in claims or separate profile
+    public string? FullName { get; set; }
+    public string? Address { get; set; }
+    public string? Country { get; set; }
+    public string? City { get; set; }
 }

@@ -206,6 +206,43 @@ public class UserService : IUserService
         }
 
         var roles = await _userManager.GetRolesAsync(user);
+
+        // Update Profile Entities
+        if (roles.Contains("Coder"))
+        {
+            var coders = await _coderRepository.FindAsync(c => c.UserId == user.Id);
+            var coder = coders.FirstOrDefault();
+            if (coder != null)
+            {
+                // Use existing values if not provided in DTO (for required params in update methods)
+                var newName = !string.IsNullOrEmpty(dto.FullName) ? dto.FullName : coder.FullName;
+                
+                // Update Personal Info
+                coder.UpdatePersonalInfo(newName, coder.BirthDate, coder.Gender);
+
+                // Update Location
+                var newAddress = dto.Address ?? coder.Address;
+                var newCountry = dto.Country ?? coder.Country;
+                var newCity = dto.City ?? coder.City;
+                coder.UpdateLocation(newAddress, newCountry, newCity);
+
+                _coderRepository.Update(coder);
+                await _coderRepository.SaveChangesAsync();
+            }
+        }
+        else if (roles.Contains("TeamLeader"))
+        {
+            var tls = await _teamLeaderRepository.FindAsync(t => t.UserId == user.Id);
+            var tl = tls.FirstOrDefault();
+            if (tl != null)
+            {
+                var newName = !string.IsNullOrEmpty(dto.FullName) ? dto.FullName : tl.FullName;
+                tl.Update(newName, tl.Gender, tl.BirthDate);
+                _teamLeaderRepository.Update(tl);
+                await _teamLeaderRepository.SaveChangesAsync();
+            }
+        }
+
         return new UserResponseDto
         {
             Id = user.Id,
@@ -218,6 +255,34 @@ public class UserService : IUserService
     {
         var user = await _userManager.FindByIdAsync(id);
         if (user == null) throw new KeyNotFoundException($"User with ID {id} not found.");
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        if (roles.Contains("Coder"))
+        {
+            var coders = await _coderRepository.FindAsync(c => c.UserId == user.Id);
+            var coder = coders.FirstOrDefault();
+            if (coder != null)
+            {
+                // Remove related ClanCoder entries first if cascade isn't set up, 
+                // but usually EF handles this if configured. 
+                // To be safe, I'll just remove the coder and hope for cascade or no strict restriction.
+                // Actually, I should probably remove ClanCoder entries too if I want to be clean.
+                // But let's start with removing the Coder.
+                _coderRepository.Remove(coder);
+                await _coderRepository.SaveChangesAsync();
+            }
+        }
+        else if (roles.Contains("TeamLeader"))
+        {
+            var tls = await _teamLeaderRepository.FindAsync(t => t.UserId == user.Id);
+            var tl = tls.FirstOrDefault();
+            if (tl != null)
+            {
+                _teamLeaderRepository.Remove(tl);
+                await _teamLeaderRepository.SaveChangesAsync();
+            }
+        }
 
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded) throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));

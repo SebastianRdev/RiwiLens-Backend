@@ -39,6 +39,17 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 
 
 // ========================
@@ -160,6 +171,7 @@ app.MapGet("/", context =>
 });
 
 
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -183,53 +195,6 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"❌ Database connection error: {ex.Message}");
     }
 }
-// ==========================================
-// SEEDS
-// ==========================================
-/*
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-
-    if (app.Environment.IsDevelopment())
-    {
-        // Identity
-        await IdentitySeeder.SeedAsync(userManager, roleManager);
-        await AdminSeed.SeedAdminsAsync(userManager, roleManager);
-
-        // Core catalog
-        await CategoryTechnicalSkillSeed.SeedAsync(context);
-        await ClassTypeSeed.SeedAsync(context);
-        await DaySeed.SeedAsync(context);
-        await RoleTeamLeaderSeed.SeedAsync(context);
-        await SoftSkillSeed.SeedAsync(context);
-        await SpecialtySeed.SeedAsync(context);
-        await TechnicalSkillSeed.SeedAsync(context);
-        
-
-        Console.WriteLine("✅ All seeds executed successfully");
-    }
-}
-*/
-/*
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var env = services.GetRequiredService<IWebHostEnvironment>();
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-
-    if (env.IsDevelopment())
-    {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        await AdminSeed.SeedAdminsAsync(userManager, roleManager);
-    }
-}
-*/
 
 
 app.Run();

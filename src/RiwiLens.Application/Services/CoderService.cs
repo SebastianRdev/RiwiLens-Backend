@@ -39,6 +39,19 @@ public class CoderService : ICoderService
         var coder = (await _coderRepository.FindAsync(c => c.Id == id)).FirstOrDefault();
         if (coder == null) return null;
 
+        return await MapToDetailDto(coder);
+    }
+
+    public async Task<CoderDetailResponseDto?> GetByIdentificationAsync(string identification)
+    {
+        var coder = (await _coderRepository.FindAsync(c => c.Identification == identification)).FirstOrDefault();
+        if (coder == null) return null;
+
+        return await MapToDetailDto(coder);
+    }
+
+    private async Task<CoderDetailResponseDto> MapToDetailDto(Coder coder)
+    {
         var baseDto = await MapToDto(coder);
         
         var detailDto = new CoderDetailResponseDto
@@ -68,7 +81,7 @@ public class CoderService : ICoderService
             detailDto.Portfolio = profile.Portfolio;
         }
 
-        var coderTechSkills = await _coderTechSkillRepository.FindAsync(x => x.CoderId == id);
+        var coderTechSkills = await _coderTechSkillRepository.FindAsync(x => x.CoderId == coder.Id);
         foreach (var cts in coderTechSkills)
         {
             var skill = await _techSkillRepository.GetByIdAsync(cts.SkillId);
@@ -78,7 +91,7 @@ public class CoderService : ICoderService
             }
         }
 
-        var coderSoftSkills = await _coderSoftSkillRepository.FindAsync(x => x.CoderId == id);
+        var coderSoftSkills = await _coderSoftSkillRepository.FindAsync(x => x.CoderId == coder.Id);
         foreach (var css in coderSoftSkills)
         {
             var skill = await _softSkillRepository.GetByIdAsync(css.SoftSkillId);
