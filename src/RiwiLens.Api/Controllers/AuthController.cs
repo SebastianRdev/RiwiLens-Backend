@@ -44,7 +44,7 @@ public class AuthController : ControllerBase
 
         var cookieOptions = new CookieOptions
         {
-            HttpOnly = true,
+            HttpOnly = false, // Allow frontend to read cookie
             Secure = Request.IsHttps, // Dynamic: true if HTTPS, false if HTTP
             SameSite = SameSiteMode.Lax,
             Path = "/",
@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
     {
         Response.Cookies.Delete("access_token", new CookieOptions
         {
-            HttpOnly = true,
+            HttpOnly = false,
             Secure = Request.IsHttps,
             SameSite = SameSiteMode.Lax,
             Path = "/"

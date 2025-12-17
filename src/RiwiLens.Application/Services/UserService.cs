@@ -3,6 +3,7 @@ using src.RiwiLens.Application.DTOs.User;
 using src.RiwiLens.Application.Interfaces.Repositories;
 using src.RiwiLens.Application.Interfaces.Services;
 using src.RiwiLens.Domain.Entities;
+using src.RiwiLens.Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace src.RiwiLens.Application.Services;
@@ -106,7 +107,7 @@ public class UserService : IUserService
                 if (dto.ClanId.HasValue)
                 {
                     _logger.LogInformation($"Assigning Coder to Clan {dto.ClanId.Value}...");
-                    var clanCoder = new ClanCoder(dto.ClanId.Value, coder.Id, DateTime.UtcNow, true);
+                    var clanCoder = ClanCoder.Create(dto.ClanId.Value, coder.Id);
                     await _clanCoderRepository.AddAsync(clanCoder);
                     await _clanCoderRepository.SaveChangesAsync();
                 }
@@ -128,7 +129,7 @@ public class UserService : IUserService
                 {
                     _logger.LogInformation($"Assigning TeamLeader to Clan {dto.ClanId.Value}...");
                     // Assuming RoleTeamLeaderId = 1 (Default/Main)
-                    var clanTl = new ClanTeamLeader(dto.ClanId.Value, tl.Id, 1, DateTime.UtcNow);
+                    var clanTl = ClanTeamLeader.Create(dto.ClanId.Value, tl.Id, 1);
                     await _clanTlRepository.AddAsync(clanTl);
                     await _clanTlRepository.SaveChangesAsync();
                 }
