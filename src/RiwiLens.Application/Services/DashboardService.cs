@@ -133,15 +133,20 @@ public class DashboardService : IDashboardService
         var clanDict = clans.ToDictionary(c => c.Id, c => c.Name);
         var statusDict = statuses.ToDictionary(s => s.Id, s => s.Name);
         
-        // Coder -> Clan (Assuming 1 active clan or taking last)
+        // Coder -> Clan (Active only)
         var coderClanDict = clanCoders
+            .Where(cc => cc.IsActive)
             .GroupBy(cc => cc.CoderId)
-            .ToDictionary(g => g.Key, g => g.Last().ClanId); 
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(cc => cc.StartDate).First().ClanId); 
 
-        // TL -> Clan
+        // TL -> Clan (Active only, with fallback to latest)
         var tlClanDict = clanTls
             .GroupBy(ct => ct.TeamLeaderId)
-            .ToDictionary(g => g.Key, g => g.Last().ClanId);
+            .ToDictionary(g => g.Key, g => 
+            {
+                var active = g.FirstOrDefault(ct => ct.EndDate == null);
+                return active != null ? active.ClanId : g.OrderByDescending(ct => ct.StartDate).First().ClanId;
+            });
 
         foreach (var user in users)
         {
@@ -335,5 +340,58 @@ public class DashboardService : IDashboardService
             AverageAttendance = Math.Round(avgAttendance, 2),
             Coders = coders
         };
+    }
+    public async Task<IEnumerable<CoderSummaryDto>> GetCodersByClanAsync(int tlId)
+    {
+        var tl = await _tlRepository.GetByIdAsync(tlId);
+        if (tl == null) throw new KeyNotFoundException($"TeamLeader with ID {tlId} not found.");
+
+        // Get Clans assigned to TL (Active/Latest fallback)
+        var clanTls = await _clanTlRepository.FindAsync(ct => ct.TeamLeaderId == tlId);
+        var activeClanTls = clanTls.Where(ct => ct.EndDate == null).ToList();
+        
+        // If no active assignment found, fallback to latest
+        if (!activeClanTls.Any() && clanTls.Any())
+        {
+            activeClanTls.Add(clanTls.OrderByDescending(ct => ct.StartDate).First());
+        }
+
+        var clanIds = activeClanTls.Select(ct => ct.ClanId).Distinct().ToList();
+
+        if (!clanIds.Any()) return new List<CoderSummaryDto>();
+
+        // Get Coders in those Clans (Active only)
+        var allClanCoders = await _clanCoderRepository.GetAllAsync();
+        var relevantClanCoders = allClanCoders
+            .Where(cc => clanIds.Contains(cc.ClanId) && cc.IsActive)
+            .ToList();
+        
+        var coderIds = relevantClanCoders.Select(cc => cc.CoderId).Distinct().ToList();
+
+        var coders = new List<CoderSummaryDto>();
+
+        foreach (var coderId in coderIds)
+        {
+            var coder = await _coderRepository.GetByIdAsync(coderId);
+            if (coder == null) continue;
+
+            var user = await _userManager.FindByIdAsync(coder.UserId);
+            var email = user?.Email ?? "Unknown";
+
+            var status = "Unknown";
+            var statusObj = await _statusCoderRepository.GetByIdAsync(coder.StatusId);
+            if (statusObj != null) status = statusObj.Name;
+
+            coders.Add(new CoderSummaryDto
+            {
+                Id = coder.Id,
+                FullName = coder.FullName,
+                Email = email,
+                Status = status,
+                ProfileImageUrl = "" // Placeholder
+            });
+        }
+
+        return coders;
     }
 }

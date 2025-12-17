@@ -9,4 +9,5 @@ public interface IDashboardService
     Task<IEnumerable<UserResponseDto>> GetUsersAsync();
     Task<CoderDashboardDto> GetCoderDashboardAsync(int coderId);
     Task<TeamLeaderDashboardDto> GetTeamLeaderDashboardAsync(int tlId);
+    Task<IEnumerable<CoderSummaryDto>> GetCodersByClanAsync(int tlId);
 }

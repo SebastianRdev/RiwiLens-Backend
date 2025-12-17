@@ -3,6 +3,7 @@ using src.RiwiLens.Application.Interfaces;
 using src.RiwiLens.Application.DTOs.Auth;
 using src.RiwiLens.Application.Interfaces.Repositories;
 using src.RiwiLens.Domain.Entities;
+using System.Linq;
 namespace src.RiwiLens.Api.Controllers;
 
 [ApiController]
@@ -16,12 +17,22 @@ public class AuthController : ControllerBase
     public AuthController(
         IAuthService authService,
         IGenericRepository<Coder> coderRepository,
-        IGenericRepository<TeamLeader> tlRepository)
+        IGenericRepository<TeamLeader> tlRepository,
+        IGenericRepository<ClanCoder> clanCoderRepository,
+        IGenericRepository<ClanTeamLeader> clanTlRepository,
+        IGenericRepository<Clan> clanRepository)
     {
         _authService = authService;
         _coderRepository = coderRepository;
         _tlRepository = tlRepository;
+        _clanCoderRepository = clanCoderRepository;
+        _clanTlRepository = clanTlRepository;
+        _clanRepository = clanRepository;
     }
+
+    private readonly IGenericRepository<ClanCoder> _clanCoderRepository;
+    private readonly IGenericRepository<ClanTeamLeader> _clanTlRepository;
+    private readonly IGenericRepository<Clan> _clanRepository;
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
@@ -80,6 +91,14 @@ public class AuthController : ControllerBase
             var coder = coders.FirstOrDefault();
             if (coder != null)
             {
+                var clanName = "N/A";
+                var clanCoders = await _clanCoderRepository.FindAsync(cc => cc.CoderId == coder.Id && cc.IsActive);
+                if (clanCoders.Any())
+                {
+                    var clan = await _clanRepository.GetByIdAsync(clanCoders.First().ClanId);
+                    if (clan != null) clanName = clan.Name;
+                }
+
                 response = new
                 {
                     id = coder.Id, // Numeric ID
@@ -87,6 +106,7 @@ public class AuthController : ControllerBase
                     email,
                     name = coder.FullName,
                     role,
+                    clan = clanName,
                     documentType = coder.DocumentType.ToString(),
                     documentNumber = coder.Identification,
                     gender = coder.Gender.ToString(),
@@ -101,6 +121,17 @@ public class AuthController : ControllerBase
             var tl = tls.FirstOrDefault();
             if (tl != null)
             {
+                var clanName = "N/A";
+                var clanTls = await _clanTlRepository.FindAsync(ct => ct.TeamLeaderId == tl.Id);
+                var activeClanTl = clanTls.FirstOrDefault(ct => ct.EndDate == null) 
+                                   ?? clanTls.OrderByDescending(ct => ct.StartDate).FirstOrDefault();
+                
+                if (activeClanTl != null)
+                {
+                    var clan = await _clanRepository.GetByIdAsync(activeClanTl.ClanId);
+                    if (clan != null) clanName = clan.Name;
+                }
+
                 response = new
                 {
                     id = tl.Id, // Numeric ID
@@ -108,6 +139,7 @@ public class AuthController : ControllerBase
                     email,
                     name = tl.FullName,
                     role,
+                    clan = clanName,
                     documentType = "", // TL doesn't have doc type in entity
                     documentNumber = "",
                     gender = tl.Gender.ToString(),

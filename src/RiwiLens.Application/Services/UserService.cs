@@ -3,6 +3,7 @@ using src.RiwiLens.Application.DTOs.User;
 using src.RiwiLens.Application.Interfaces.Repositories;
 using src.RiwiLens.Application.Interfaces.Services;
 using src.RiwiLens.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace src.RiwiLens.Application.Services;
 
@@ -14,26 +15,35 @@ public class UserService : IUserService
     private readonly IGenericRepository<TeamLeader> _teamLeaderRepository;
     // Assuming we might need ProfessionalProfile repo if Coder creation requires it, 
     // but Coder.Create takes an ID. We might need to create a default profile first.
-    // For now, I'll assume 0 or handle it. Coder.Create takes int professionalProfileId.
-    // I should probably create a ProfessionalProfile first.
     private readonly IGenericRepository<ProfessionalProfile> _profileRepository;
+    private readonly ILogger<UserService> _logger;
+    private readonly IGenericRepository<ClanCoder> _clanCoderRepository;
+    private readonly IGenericRepository<ClanTeamLeader> _clanTlRepository;
 
     public UserService(
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
         IGenericRepository<Coder> coderRepository,
         IGenericRepository<TeamLeader> teamLeaderRepository,
-        IGenericRepository<ProfessionalProfile> profileRepository)
+        IGenericRepository<ProfessionalProfile> profileRepository,
+        ILogger<UserService> logger,
+        IGenericRepository<ClanCoder> clanCoderRepository,
+        IGenericRepository<ClanTeamLeader> clanTlRepository)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _coderRepository = coderRepository;
         _teamLeaderRepository = teamLeaderRepository;
         _profileRepository = profileRepository;
+        _logger = logger;
+        _clanCoderRepository = clanCoderRepository;
+        _clanTlRepository = clanTlRepository;
     }
 
     public async Task<UserResponseDto> CreateUserAsync(CreateUserDto dto)
     {
+        _logger.LogInformation($"CreateUserAsync called. Email: {dto.Email}, Role: {dto.Role}, ClanId: {dto.ClanId}");
+
         var user = new ApplicationUser
         {
             UserName = dto.Email,
@@ -43,51 +53,93 @@ public class UserService : IUserService
         var result = await _userManager.CreateAsync(user, dto.Password);
         if (!result.Succeeded)
         {
+            _logger.LogError($"User creation failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
-        if (!string.IsNullOrEmpty(dto.Role))
+        try
         {
-            if (await _roleManager.RoleExistsAsync(dto.Role))
+            if (!string.IsNullOrEmpty(dto.Role))
             {
-                await _userManager.AddToRoleAsync(user, dto.Role);
+                if (await _roleManager.RoleExistsAsync(dto.Role))
+                {
+                    await _userManager.AddToRoleAsync(user, dto.Role);
+                }
+                else
+                {
+                    _logger.LogWarning($"Role {dto.Role} does not exist.");
+                }
+            }
+
+            // Set Defaults for missing fields
+            var gender = dto.Gender == Gender.Unknown ? Gender.Other : dto.Gender;
+            var docType = dto.DocumentType == DocumentType.Unknown ? DocumentType.CC : dto.DocumentType;
+            var identification = string.IsNullOrEmpty(dto.Identification) ? Guid.NewGuid().ToString().Substring(0, 10) : dto.Identification;
+            var birthDate = dto.BirthDate == default ? DateTime.UtcNow : dto.BirthDate;
+
+            // Create Profile based on Role
+            if (dto.Role == "Coder")
+            {
+                _logger.LogInformation("Creating Coder entity...");
+                // Create default ProfessionalProfile
+                var newProfile = ProfessionalProfile.Create(string.Empty); 
+                await _profileRepository.AddAsync(newProfile);
+                await _profileRepository.SaveChangesAsync();
+
+                var coder = Coder.Create(
+                    dto.FullName,
+                    user.Id,
+                    docType,
+                    identification,
+                    birthDate,
+                    dto.Address ?? "",
+                    dto.Country ?? "",
+                    dto.City ?? "",
+                    gender,
+                    newProfile.Id,
+                    1 // StatusId 1 = Active (Assumption)
+                );
+                await _coderRepository.AddAsync(coder);
+                await _coderRepository.SaveChangesAsync();
+                _logger.LogInformation($"Coder entity created successfully. ID: {coder.Id}");
+
+                if (dto.ClanId.HasValue)
+                {
+                    _logger.LogInformation($"Assigning Coder to Clan {dto.ClanId.Value}...");
+                    var clanCoder = new ClanCoder(dto.ClanId.Value, coder.Id, DateTime.UtcNow, true);
+                    await _clanCoderRepository.AddAsync(clanCoder);
+                    await _clanCoderRepository.SaveChangesAsync();
+                }
+            }
+            else if (dto.Role == "TeamLeader")
+            {
+                _logger.LogInformation("Creating TeamLeader entity...");
+                var tl = TeamLeader.Create(
+                    user.Id,
+                    dto.FullName,
+                    gender,
+                    birthDate
+                );
+                await _teamLeaderRepository.AddAsync(tl);
+                await _teamLeaderRepository.SaveChangesAsync();
+                _logger.LogInformation($"TeamLeader entity created successfully. ID: {tl.Id}");
+
+                if (dto.ClanId.HasValue)
+                {
+                    _logger.LogInformation($"Assigning TeamLeader to Clan {dto.ClanId.Value}...");
+                    // Assuming RoleTeamLeaderId = 1 (Default/Main)
+                    var clanTl = new ClanTeamLeader(dto.ClanId.Value, tl.Id, 1, DateTime.UtcNow);
+                    await _clanTlRepository.AddAsync(clanTl);
+                    await _clanTlRepository.SaveChangesAsync();
+                }
             }
         }
-
-        // Create Profile based on Role
-        if (dto.Role == "Coder")
+        catch (Exception ex)
         {
-            // Create default ProfessionalProfile
-            var newProfile = ProfessionalProfile.Create(string.Empty); 
-            await _profileRepository.AddAsync(newProfile);
-            await _profileRepository.SaveChangesAsync();
-
-            var coder = Coder.Create(
-                dto.FullName,
-                user.Id,
-                dto.DocumentType,
-                dto.Identification,
-                dto.BirthDate,
-                dto.Address ?? "",
-                dto.Country ?? "",
-                dto.City ?? "",
-                dto.Gender,
-                newProfile.Id,
-                1 // StatusId 1 = Active (Assumption)
-            );
-            await _coderRepository.AddAsync(coder);
-            await _coderRepository.SaveChangesAsync();
-        }
-        else if (dto.Role == "TeamLeader")
-        {
-            var tl = TeamLeader.Create(
-                user.Id,
-                dto.FullName,
-                dto.Gender,
-                dto.BirthDate
-            );
-            await _teamLeaderRepository.AddAsync(tl);
-            await _teamLeaderRepository.SaveChangesAsync();
+            _logger.LogError(ex, "Error creating entity. Rolling back user creation.");
+            // Rollback: Delete the user if entity creation fails
+            await _userManager.DeleteAsync(user);
+            throw;
         }
 
         return new UserResponseDto

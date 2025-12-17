@@ -65,4 +65,42 @@ public class DashboardController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet("teamleader/coders")]
+    [Authorize(Roles = "TeamLeader")]
+    public async Task<IActionResult> GetCodersByClan()
+    {
+        try
+        {
+            // Get Numeric ID from Token
+            var numericIdClaim = User.FindFirst("numericId")?.Value;
+            if (string.IsNullOrEmpty(numericIdClaim) || !int.TryParse(numericIdClaim, out int tlId))
+            {
+                // Fallback: Get by UUID
+                var uuid = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(uuid)) return Unauthorized();
+                
+                 var idClaim = User.FindFirst("id")?.Value;
+                 if (!string.IsNullOrEmpty(idClaim) && int.TryParse(idClaim, out int id))
+                 {
+                     tlId = id;
+                 }
+                 else
+                 {
+                     return Unauthorized("User ID not found in token.");
+                 }
+            }
+
+            var coders = await _dashboardService.GetCodersByClanAsync(tlId);
+            return Ok(coders);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
 }

@@ -19,4 +19,7 @@ public class CreateUserDto
     public string? Address { get; set; }
     public string? Country { get; set; }
     public string? City { get; set; }
+
+    // Clan Assignment
+    public int? ClanId { get; set; }
 }

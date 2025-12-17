@@ -11,9 +11,8 @@ RiwiLens Backend is a production‑ready RESTful API that manages the academic e
 | Endpoint | Method | Description |
 |---|---|---|
 | `/api/auth/login` | POST | Authenticates user credentials, issues a JWT and stores it in an HttpOnly cookie. |
-| `/api/auth/refresh` | POST | Uses a refresh token (also stored in a cookie) to issue a new JWT without re‑authenticating. |
 | `/api/auth/logout` | POST | Clears authentication cookies, effectively logging the user out. |
-| `/api/auth/me` | GET | Returns the full profile of the authenticated user: `id`, `uuid`, `email`, `firstName`, `lastName`, `role`, `documentType`, `documentNumber`, `gender`, `isActive`, `profileImageUrl`, etc. |
+| `/api/auth/me` | GET | Returns the full profile of the authenticated user: `id`, `uuid`, `email`, `name`, `role`, `documentType`, `documentNumber`, `gender`, `isActive`, `profileImageUrl`, etc. |
 
 All protected endpoints require the `[Authorize]` attribute and enforce role policies where appropriate.
 
@@ -86,6 +85,184 @@ All protected endpoints require the `[Authorize]` attribute and enforce role pol
 - `GET /api/Notification`
 - `POST /api/Notification`
 - `PUT /api/Notification/{id}/read`
+
+
+## Domain Entities (Properties)
+### Attendance
+- `Id: int` (PK)
+- `ClanId: int` (FK → Clan)
+- `ClassId: int` (FK → Class)
+- `CoderId: int` (FK → Coder)
+- `TimestampIn: DateTime`
+- `Status: AttendanceStatus` (enum)
+- `VerifiedBy: string`
+- `ImageUrl: string`
+- Navigation properties: `Clan`, `Class`, `Coder`
+
+### Coder
+- `Id: int` (PK)
+- `FullName: string`
+- `UserId: string` (FK → ApplicationUser)
+- `DocumentType: DocumentType` (enum)
+- `Identification: string`
+- `Address: string`
+- `BirthDate: DateTime`
+- `ProfessionalProfileId: int` (FK → ProfessionalProfile)
+- `Country: string`
+- `City: string`
+- `Gender: Gender` (enum)
+- `StatusId: int` (FK → StatusCoder)
+- Navigation collections: `SoftSkills`, `TechnicalSkills`, `Feedback`, `ClanCoders`, `Attendances`, `FaceCollections`, `Notifications`
+
+### Clan
+- `Id: int` (PK)
+- `Name: string`
+- `Description: string`
+- Navigation collections: `ClanCoders` (many‑to‑many with Coder), `ClanTeamLeaders` (many‑to‑many with TeamLeader)
+
+### ClanCoder (junction table)
+- `ClanId: int` (FK → Clan)
+- `CoderId: int` (FK → Coder)
+- Composite PK `(ClanId, CoderId)`
+
+### ClanTeamLeader (junction table)
+- `ClanId: int` (FK → Clan)
+- `TeamLeaderId: int` (FK → TeamLeader)
+- Composite PK `(ClanId, TeamLeaderId)`
+
+### Class
+- `Id: int` (PK)
+- `Name: string`
+- `Description: string`
+- `ClassTypeId: int` (FK → ClassType)
+- `DayId: int` (FK → Day)
+- `StartTime: TimeSpan`
+- `EndTime: TimeSpan`
+- Navigation collections: `Attendances`
+
+### ClassType
+- `Id: int` (PK)
+- `Name: string`
+- `Description: string`
+
+### Day
+- `Id: int` (PK)
+- `Name: string` (e.g., Monday)
+
+### CoderSoftSkill (junction)
+- `CoderId: int` (FK → Coder)
+- `SoftSkillId: int` (FK → SoftSkill)
+- Composite PK `(CoderId, SoftSkillId)`
+
+### CoderTechnicalSkill (junction)
+- `CoderId: int` (FK → Coder)
+- `TechnicalSkillId: int` (FK → TechnicalSkill)
+- Composite PK `(CoderId, TechnicalSkillId)`
+
+### SoftSkill
+- `Id: int` (PK)
+- `Name: string`
+- `Description: string`
+
+### TechnicalSkill
+- `Id: int` (PK)
+- `Name: string`
+- `Description: string`
+- `Level: TechnicalSkillLevel` (enum)
+
+### Feedback
+- `Id: int` (PK)
+- `CoderId: int?` (FK → Coder, optional)
+- `TeamLeaderId: int?` (FK → TeamLeader, optional)
+- `FeedbackType: FeedbackType` (enum)
+- `Content: string`
+- Navigation properties: `Coder`, `TeamLeader`
+
+### Notification
+- `Id: int` (PK)
+- `UserId: string` (FK → ApplicationUser)
+- `Message: string`
+- `Type: NotificationType` (enum)
+- `IsRead: bool`
+- `CreatedAt: DateTime`
+
+### ProfessionalProfile
+- `Id: int` (PK)
+- `Title: string`
+- `Description: string`
+- `Specialties` (collection of `Specialty` via `TeamLeaderSpecialty`)
+
+### Specialty
+- `Id: int` (PK)
+- `Name: string`
+- `Level: TeamLeaderSpecialtyLevel` (enum)
+
+### StatusCoder
+- `Id: int` (PK)
+- `Name: string`
+
+### TeamLeader
+- `Id: int` (PK)
+- `FullName: string`
+- `UserId: string` (FK → ApplicationUser)
+- Navigation collections: `ClanTeamLeaders`, `Specialties`
+
+### TeamLeaderSpecialty (junction)
+- `TeamLeaderId: int` (FK → TeamLeader)
+- `SpecialtyId: int` (FK → Specialty)
+- Composite PK `(TeamLeaderId, SpecialtyId)`
+
+## Enums (Values)
+### AttendanceStatus
+- `Present`
+- `Absent`
+- `Justified`
+- `Late`
+- `Excused`
+
+### DocumentType
+- `DNI`
+- `Passport`
+- `Other`
+- `Unknown`
+
+### Gender
+- `Male`
+- `Female`
+- `Other`
+- `Unknown`
+
+### NotificationType
+- `Info`
+- `Warning`
+- `Error`
+
+### TeamLeaderSpecialtyLevel
+- `Junior`
+- `Mid`
+- `Senior`
+- `Lead`
+
+### TechnicalSkillLevel
+- `Beginner`
+- `Intermediate`
+- `Advanced`
+- `Expert`
+
+## Relationships Overview
+- **Coder ↔ Clan**: many‑to‑many via `ClanCoder`.
+- **TeamLeader ↔ Clan**: many‑to‑many via `ClanTeamLeader`.
+- **Coder ↔ SoftSkill**: many‑to‑many via `CoderSoftSkill`.
+- **Coder ↔ TechnicalSkill**: many‑to‑many via `CoderTechnicalSkill`.
+- **Clan ↔ Attendance**: one‑to‑many (a Clan has many Attendances).
+- **Class ↔ Attendance**: one‑to‑many.
+- **Coder ↔ Attendance**: one‑to‑many.
+- **Coder ↔ Feedback**: one‑to‑many (optional TeamLeader side).
+- **TeamLeader ↔ Feedback**: one‑to‑many (optional Coder side).
+- **TeamLeader ↔ Specialty**: many‑to‑many via `TeamLeaderSpecialty`.
+- **ProfessionalProfile ↔ Specialty**: one‑to‑many (profile aggregates specialties).
+- **Notification ↔ ApplicationUser**: many‑to‑one (each notification belongs to a user).
+- **Class ↔ ClassType / Day**: many‑to‑one (each Class has a ClassType and a Day).
 
 
 ## Architecture

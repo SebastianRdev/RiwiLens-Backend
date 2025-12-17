@@ -37,6 +37,9 @@ public static class DependencyInjection
         services.AddScoped<ICatalogService, CatalogService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<ICvService, CvService>();
+        services.AddScoped<IPdfService, PdfService>();
+
+        QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
         
         services.AddSingleton<Client>(sp => 
         {

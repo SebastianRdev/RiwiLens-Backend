@@ -73,7 +73,7 @@ public class ClansController : ControllerBase
         }
     }
 
-    [HttpPost("{id}/coders")]
+    [HttpPost("{id}/assign-coder")]
     public async Task<ActionResult> AssignCoder(int id, [FromBody] AssignCoderDto dto)
     {
         try
@@ -87,7 +87,7 @@ public class ClansController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}/coders/{coderId}")]
+    [HttpDelete("{id}/coder/{coderId}")]
     public async Task<ActionResult> RemoveCoder(int id, int coderId)
     {
         try
@@ -101,7 +101,7 @@ public class ClansController : ControllerBase
         }
     }
 
-    [HttpPost("{id}/team-leaders")]
+    [HttpPost("{id}/assign-team-leader")]
     public async Task<ActionResult> AssignTeamLeader(int id, [FromBody] AssignTeamLeaderDto dto)
     {
         try
@@ -115,7 +115,7 @@ public class ClansController : ControllerBase
         }
     }
 
-    [HttpDelete("{id}/team-leaders/{tlId}")]
+    [HttpDelete("{id}/team-leader/{tlId}")]
     public async Task<ActionResult> RemoveTeamLeader(int id, int tlId)
     {
         try
